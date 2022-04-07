@@ -109,25 +109,23 @@ class HandleRequests(BaseHTTPRequestHandler):
         (resource, id) = self.parse_url(self.path)
 
         # Initialize new animal
-        new_animal = None
+        response = None
 
         # Add a new animal to the list. Don't worry about
         # the orange squiggle, you'll define the create_animal
         # function next.
         if resource == "animals":
-            new_animal = create_animal(post_body)
+            response = create_animal(post_body)
         # Encode the new animal and send in response
-        self.wfile.write(f"{new_animal}".encode())
             
         if resource == "employees":
-            new_employee = create_employee(post_body)
+            response = create_employee(post_body)
         # Encode the new employee and send in response
-        self.wfile.write(f"{new_employee}".encode())
         
         if resource == "locations":
-            new_location = create_location(post_body)
+            response = create_location(post_body)
         # Encode the new location and send in response
-        self.wfile.write(f"{new_location}".encode())
+        self.wfile.write(f"{response}".encode())
         
         
     def do_DELETE(self):
