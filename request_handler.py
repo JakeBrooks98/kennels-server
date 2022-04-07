@@ -1,8 +1,9 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
-from views import get_all_animals, get_single_animal, create_animal
-from views import get_all_locations, get_single_location, create_location
-from views import get_all_employees, get_single_employee, create_employee
+from views import get_all_animals, get_single_animal, create_animal, delete_animal
+from views import get_all_locations, get_single_location, create_location, delete_location
+from views import get_all_employees, get_single_employee, create_employee, delete_employee
+
 
 
 # Here's a class. It inherits from another class.
@@ -127,6 +128,29 @@ class HandleRequests(BaseHTTPRequestHandler):
             new_location = create_location(post_body)
         # Encode the new location and send in response
         self.wfile.write(f"{new_location}".encode())
+        
+        
+    def do_DELETE(self):
+        # Set a 204 response code
+        self._set_headers(204)
+
+        # Parse the URL
+        (resource, id) = self.parse_url(self.path)
+
+        # Delete a single animal from the list
+        if resource == "animals":
+            delete_animal(id)
+            
+        # Delete a single employee from the list
+        if resource == "employees":
+            delete_employee(id)
+            
+        # Delete a single location from the list
+        if resource == "locations":
+            delete_location(id)
+
+        # Encode the new animal and send in response
+        self.wfile.write("".encode())
 
 
     # Here's a method on the class that overrides the parent's method.
