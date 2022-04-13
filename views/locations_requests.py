@@ -1,6 +1,6 @@
 import sqlite3
 import json
-from models import location
+from models import Location
 
 LOCATIONS =[
         {
@@ -27,7 +27,6 @@ def get_all_locations():
         db_cursor.execute("""
         SELECT
             l.id,
-            l.name,
             l.address,
         FROM location l
         """)
@@ -45,7 +44,7 @@ def get_all_locations():
             # Note that the database fields are specified in
             # exact order of the parameters defined in the
             # location class above.
-            location = Location(row['id'], row['name'], row['address'])
+            location = Location(row['id'], row['address'])
 
             locations.append(location.__dict__)
 
@@ -62,7 +61,6 @@ def get_single_location(id):
         db_cursor.execute("""
         SELECT
             l.id,
-            l.name,
             l.address
         FROM location l
         WHERE l.id = ?
@@ -72,7 +70,7 @@ def get_single_location(id):
         data = db_cursor.fetchone()
 
         # Create an location instance from the current row
-        location = Location(data['id'], data['name'], data['address'])
+        location = Location(data['id'], data['address'])
 
         return json.dumps(location.__dict__)
    

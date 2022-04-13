@@ -2,28 +2,6 @@ import sqlite3
 import json
 from models import Employee
 
-EMPLOYEES=[
-        {
-            "id": 1,
-            "name": "Jake Brooks",
-        },
-        {
-            "id": 2,
-            "name": "Erich Hills",
-        },
-        {
-            "id": 3,
-            "name": "Adam Donaghy",
-        },
-        {
-            "id": 4,
-            "name": "Lauden Eller",
-        },
-        {
-            "id": 5,
-            "name": "stevie Hollander",
-        }
-    ]
 
 def get_all_employees():
     # Open a connection to the database
@@ -37,7 +15,9 @@ def get_all_employees():
         db_cursor.execute("""
         SELECT
             e.id,
-            e.name
+            e.name,
+            e.address,
+            e.location_id
         FROM employee e
         """)
 
@@ -54,7 +34,7 @@ def get_all_employees():
             # Note that the database fields are specified in
             # exact order of the parameters defined in the
             # employee class above.
-            employee = Employee(row['id'], row['name'])
+            employee = Employee(row['id'], row['name'],row['address'],row['location_id'])
 
             employees.append(employee.__dict__)
 
@@ -71,7 +51,9 @@ def get_single_employee(id):
         db_cursor.execute("""
         SELECT
             e.id,
-            e.name
+            e.name,
+            e.address,
+            e.location_id
         FROM employee e
         WHERE e.id = ?
         """, ( id, ))
@@ -80,30 +62,33 @@ def get_single_employee(id):
         data = db_cursor.fetchone()
 
         # Create an employee instance from the current row
-        employee = Employee(data['id'], data['name'])
+        employee = Employee(data['id'], data['name'], data['address'], data['location_id'])
 
         return json.dumps(employee.__dict__)
 
-def delete_employee(id):
-    # Initial -1 value for employee index, in case one isn't found
-    employee_index = -1
 
-    # Iterate the employeeS list, but use enumerate() so that you
-    # can access the index value of each item
-    for index, employee in enumerate(EMPLOYEES):
-        if employee["id"] == id:
-            # Found the employee. Store the current index.
-            employee_index = index
+def get_employees_by_location(location_id):
 
-    # If the employee was found, use pop(int) to remove it from list
-    if employee_index >= 0:
-        EMPLOYEES.pop(employee_index)
-        
-def update_employee(id, new_employee):
-    # Iterate the employeeS list, but use enumerate() so that
-    # you can access the index value of each item.
-    for index, employee in enumerate(EMPLOYEES):
-        if employee["id"] == id:
-            # Found the employee. Update the value.
-            EMPLOYEES[index] = new_employee
-            break
+    with sqlite3.connect("./kennel.sqlite3") as conn:
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
+
+        # Write the SQL query to get the information you want
+        db_cursor.execute("""
+        SELECT
+            e.id,
+            e.name,
+            e.address,
+            e.location_id
+        FROM employee e
+        WHERE e.location_id = ?
+        """, ( location_id, ))
+
+        employees = []
+        dataset = db_cursor.fetchall()
+
+        for row in dataset:
+            employee = Employee(row['id'], row['name'], row['address'], row['location_id'])
+            employees.append(employee.__dict__)
+
+    return json.dumps(employees)
