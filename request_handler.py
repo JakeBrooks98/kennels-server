@@ -1,6 +1,6 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
-from views import get_all_animals, get_single_animal, get_animals_by_location, get_animals_by_status
+from views import get_all_animals, get_single_animal, get_animals_by_location, get_animals_by_status, delete_animal
 from views import get_all_locations, get_single_location
 from views import get_all_employees, get_single_employee, get_employees_by_location
 from views import get_all_customers, get_single_customer, get_customers_by_email
@@ -128,6 +128,20 @@ class HandleRequests(BaseHTTPRequestHandler):
                 response = get_employees_by_location(value)
 
         self.wfile.write(response.encode())
+        
+    def do_DELETE(self):
+        # Set a 204 response code
+        self._set_headers(204)
+
+        # Parse the URL
+        (resource, id) = self.parse_url(self.path)
+
+        # Delete a single animal from the list
+        if resource == "animals":
+            delete_animal(id)
+
+        # Encode the new animal and send in response
+        self.wfile.write("".encode())
 
 
 
